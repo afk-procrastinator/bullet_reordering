@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Categorization Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Text Categorization Tool</h1>
+        <p class="description">Paste your lines of text below, and categorize each line into one of the predefined categories.</p>
+        
+        <div class="input-section">
+            <h2>Input</h2>
+            <div id="inputContainer">
+                <textarea id="inputEditor" class="editor-area" placeholder="Paste your text here. Each line will be presented for categorization."></textarea>
+            </div>
+            <button id="startButton">Start Categorization</button>
+        </div>
+        
+        <div class="categorization-section" id="categorizationSection" style="display: none;">
+            <h2>Categorize Item</h2>
+            <div id="currentItem" class="current-item"></div>
+            <div class="category-buttons">
+                <button class="category-btn" data-category="AI Governance"><span class="key-number">1</span> AI Governance</button>
+                <button class="category-btn" data-category="Safety & Stability"><span class="key-number">2</span> Safety & Stability</button>
+                <button class="category-btn" data-category="Biotech"><span class="key-number">3</span> Biotech</button>
+                <button class="category-btn" data-category="DSR"><span class="key-number">4</span> DSR</button>
+                <button class="category-btn" data-category="Indo-Pacific"><span class="key-number">5</span> Indo-Pacific</button>
+                <button class="category-btn" data-category="Quantum"><span class="key-number">6</span> Quantum</button>
+                <button class="category-btn" data-category="Other"><span class="key-number">7</span> Other</button>
+                <button class="category-btn" data-category="Error"><span class="key-number">8</span> Error</button>
+            </div>
+            <div class="progress-indicator">
+                <span id="progressText">Item 0 of 0</span>
+            </div>
+        </div>
+        
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <h2>Categorization Results</h2>
+            <div id="resultsContainer" class="results-container"></div>
+            <button id="copyResultsButton">Copy Results</button>
+            <button id="startOverButton">Start Over</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
