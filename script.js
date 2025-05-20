@@ -9,33 +9,147 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsContainer = document.getElementById('resultsContainer');
     const copyResultsButton = document.getElementById('copyResultsButton');
     const startOverButton = document.getElementById('startOverButton');
+    const categoryList = document.getElementById('categoryList');
+    const newCategoryInput = document.getElementById('newCategoryInput');
+    const addCategoryButton = document.getElementById('addCategoryButton');
     const categoryButtons = document.querySelectorAll('.category-btn');
 
     // State variables
     let items = [];
     let currentItemIndex = 0;
-    let categorizedItems = {
-        'AI Governance': [],
-        'Safety & Stability': [],
-        'Biotech': [],
-        'DSR': [],
-        'Indo-Pacific': [],
-        'Quantum': [],
-        'Other': [],
-        'Error': []
-    };
+    let categories = [
+        'AI Governance',
+        'Safety & Stability',
+        'Biotech',
+        'DSR',
+        'Indo-Pacific',
+        'Quantum',
+        'Other',
+        'Error'
+    ];
+    let categorizedItems = {};
+    let categoryKeyMap = {};
 
-    // Category to key mapping
-    const categoryKeyMap = {
-        '1': 'AI Governance',
-        '2': 'Safety & Stability',
-        '3': 'Biotech',
-        '4': 'DSR',
-        '5': 'Indo-Pacific',
-        '6': 'Quantum',
-        '7': 'Other',
-        '8': 'Error'
-    };
+    // Initialize categorizedItems
+    function initializeCategorizedItems() {
+        categorizedItems = {};
+        categories.forEach(category => {
+            categorizedItems[category] = [];
+        });
+    }
+
+    // Initialize category buttons
+    function initializeCategoryButtons() {
+        const categoryButtonsContainer = document.querySelector('.category-buttons');
+        categoryButtonsContainer.innerHTML = '';
+        
+        categories.forEach((category, index) => {
+            const button = document.createElement('button');
+            button.className = 'category-btn';
+            button.setAttribute('data-category', category);
+            button.innerHTML = `<span class="key-number">${index + 1}</span> ${category}`;
+            
+            // Add click event listener to each button
+            button.addEventListener('click', () => {
+                if (currentItemIndex < items.length) {
+                    const category = button.getAttribute('data-category');
+                    categorizedItems[category].push(items[currentItemIndex]);
+                    
+                    // Move to next item
+                    currentItemIndex++;
+                    displayCurrentItem();
+                }
+            });
+            
+            categoryButtonsContainer.appendChild(button);
+        });
+    }
+
+    // Update category key mapping
+    function updateCategoryKeyMap() {
+        categoryKeyMap = {};
+        categories.forEach((category, index) => {
+            categoryKeyMap[(index + 1).toString()] = category;
+        });
+    }
+
+    // Render category list
+    function renderCategoryList() {
+        categoryList.innerHTML = '';
+        categories.forEach(category => {
+            const categoryElement = document.createElement('div');
+            categoryElement.className = 'category-item';
+            categoryElement.innerHTML = `
+                <span class="category-name">${category}</span>
+                <button class="remove-category" data-category="${category}">&times;</button>
+            `;
+            categoryList.appendChild(categoryElement);
+        });
+
+        // Add event listener to the category list container for event delegation
+        categoryList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-category')) {
+                const category = e.target.getAttribute('data-category');
+                removeCategory(category);
+            }
+        });
+    }
+
+    // Add new category
+    function addCategory(categoryName) {
+        if (!categoryName || categories.includes(categoryName)) {
+            return;
+        }
+        categories.push(categoryName);
+        categorizedItems[categoryName] = [];
+        renderCategoryList();
+        initializeCategoryButtons();
+        updateCategoryKeyMap();
+    }
+
+    // Remove category
+    function removeCategory(category) {
+        // Don't allow removing categories if categorization has started
+        if (currentItemIndex > 0) {
+            alert('Cannot remove categories after categorization has started. Please start over first.');
+            return;
+        }
+
+        const index = categories.indexOf(category);
+        if (index > -1) {
+            categories.splice(index, 1);
+            delete categorizedItems[category];
+            renderCategoryList();
+            initializeCategoryButtons();
+            updateCategoryKeyMap();
+        }
+    }
+
+    // Initialize the UI
+    initializeCategorizedItems();
+    renderCategoryList();
+    initializeCategoryButtons();
+    updateCategoryKeyMap();
+
+    // Add category button event listener
+    addCategoryButton.addEventListener('click', () => {
+        const newCategory = newCategoryInput.value.trim();
+        if (newCategory) {
+            addCategory(newCategory);
+            newCategoryInput.value = '';
+        }
+    });
+
+    // Add category on Enter key
+    newCategoryInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const newCategory = newCategoryInput.value.trim();
+            if (newCategory) {
+                addCategory(newCategory);
+                newCategoryInput.value = '';
+            }
+        }
+    });
 
     // Start categorization process
     startButton.addEventListener('click', () => {
@@ -57,16 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Reset state
         currentItemIndex = 0;
-        categorizedItems = {
-            'AI Governance': [],
-            'Safety & Stability': [],
-            'Biotech': [],
-            'DSR': [],
-            'Indo-Pacific': [],
-            'Quantum': [],
-            'Other': [],
-            'Error': []
-        };
+        initializeCategorizedItems();
 
         // Show categorization section and hide input section
         document.querySelector('.input-section').style.display = 'none';
@@ -124,20 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.removeEventListener('keydown', handleKeyPress);
         }
     }
-
-    // Handle category button clicks
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (currentItemIndex < items.length) {
-                const category = button.getAttribute('data-category');
-                categorizedItems[category].push(items[currentItemIndex]);
-                
-                // Move to next item
-                currentItemIndex++;
-                displayCurrentItem();
-            }
-        });
-    });
 
     // Show the categorization results
     function showResults() {
